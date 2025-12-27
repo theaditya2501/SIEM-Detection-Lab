@@ -1,0 +1,58 @@
+🚀 Setup Instructions
+
+Follow these steps to deploy the SIEM lab and reproduce the detection results.
+1. Prerequisites
+
+    Docker & Docker Compose installed.
+
+    Kali Linux (or any Linux VM) with ssh and hydra installed.
+
+2. Deploy the SIEM Stack
+
+Navigate to the directory containing your docker-compose.yml and run:
+Bash
+
+docker-compose up -d
+
+    This will launch Elasticsearch on port 9200 and Kibana on port 5601.
+
+    Wait about 1-2 minutes for the services to initialize. Access the dashboard at http://localhost:5601.
+
+3. Configure Log Collection (Filebeat)
+
+    Move the filebeat.yml to your Kali Linux machine.
+
+    Install Filebeat and start the service:
+
+Bash
+
+sudo filebeat modules enable system
+sudo filebeat setup
+sudo service filebeat start
+
+    This begins shipping auth.log data to your Elasticsearch instance.
+
+4. Import Detection Logic
+
+To see the alerts and dashboards I created:
+
+    In Kibana, go to Stack Management > Saved Objects.
+
+    Click Import and select the .ndjson files from the /configs folder.
+
+    Go to Security > Rules and ensure the "LAB - Local SSH Brute Force" rule is enabled.
+
+5. Reproduce the Attack
+
+Run the following command in your terminal to trigger the detection rule:
+Bash
+
+hydra -l admin -P /usr/share/wordlists/rockyou.txt 127.0.0.1 ssh -s 22 -t 4
+
+    Note: Ensure you have unzipped rockyou.txt.gz before running.
+
+6. Verify Results
+
+    Open the "SSH Brute Force Attack Timeline" dashboard in Kibana.
+
+    You should see a real-time spike in the Count of records graph, confirming the attack was detected.
