@@ -1,0 +1,19 @@
+filebeat.inputs:
+  - type: filestream
+    id: ssh-auth
+    enabled: true
+    paths:
+      - /var/log/auth.log
+
+processors:
+  - add_host_metadata: {}
+
+setup.ilm.enabled: false
+
+output.elasticsearch:
+  hosts: ["http://elasticsearch:9200"]
+  username: "elastic"
+  password: "elastic123"
+
+setup.kibana:
+  host: "http://kibana:5601"
